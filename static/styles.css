@@ -1,0 +1,103 @@
+
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-image: url('mundo.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff; 
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            position: relative; 
+            z-index: 1;
+        }
+
+        .selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .selector div {
+            margin: 10px 0;
+        }
+
+        label {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button {
+            padding: 12px 30px;
+            background-color: #1e88e5; 
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #1565c0; /* Cambia el color de hover a un azul más oscuro */
+        }
+
+        /* Estilos para el mapa */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .info {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .info p {
+            font-size: 1.2em;
+            color: #333; /* Color negro para el texto de kilómetros y nodos */
+        }
+
+        .info p span {
+            font-weight: bold;
+            color: #000; /* Color negro para los nodos y kilómetros */
+        }
+
+        .footer {
+            text-align: center;
+            color: #000;
+            margin-top: 20px;
+            font-weight: bold; /* Texto del footer en negritas */
+        }
+  
