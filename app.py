@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, jsonify
+import os
+from dotenv import load_dotenv
+
 
 app = Flask(__name__)
+load_dotenv()
 
 # Coordenadas de las ciudades
 coord = {
@@ -40,7 +44,11 @@ coord = {
 
 @app.route('/')
 def index():
-    return render_template('index.html', ciudades=coord.keys())
+    return render_template(
+        'index.html',
+        ciudades=coord.keys(),
+        google_maps_api_key=os.getenv('GOOGLE_MAPS_API_KEY')
+    )
 
 @app.route('/get_routes', methods=['POST'])
 def get_routes():
