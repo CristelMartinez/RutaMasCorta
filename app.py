@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify
-import math
 
 app = Flask(__name__)
 
@@ -39,65 +38,6 @@ coord = {
     'Zacatecas': [22.7709, -102.5833]
 }
 
-# Calcular la distancia euclidiana entre dos puntos
-def calcular_distancia(coord1, coord2):
-    return ((coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2) ** 0.5
-
-# Implementar el algoritmo de Dijkstra
-def dijkstra(grafo, origen, destino):
-    distancias = {nodo: float('inf') for nodo in grafo}
-    distancias[origen] = 0
-    predecesores = {nodo: None for nodo in grafo}
-    nodos_no_visitados = set(grafo)
-
-    while nodos_no_visitados:
-        nodo_actual = min(nodos_no_visitados, key=lambda nodo: distancias[nodo])
-
-        if distancias[nodo_actual] == float('inf'):
-            break
-
-        for vecino, peso in grafo[nodo_actual].items():
-            nueva_distancia = distancias[nodo_actual] + peso
-            if nueva_distancia < distancias[vecino]:
-                distancias[vecino] = nueva_distancia
-                predecesores[vecino] = nodo_actual
-
-        nodos_no_visitados.remove(nodo_actual)
-
-    camino = []
-    paso_actual = destino
-    while paso_actual is not None:
-        camino.insert(0, paso_actual)
-        paso_actual = predecesores[paso_actual]
-
-    if distancias[destino] == float('inf'):
-        return "No hay camino disponible", []
-    
-    return camino
-
-# Crear el grafo como un diccionario
-grafo = {ciudad: {} for ciudad in coord}
-
-for ciudad1 in coord:
-    for ciudad2 in coord:
-        if ciudad1 != ciudad2:
-            distancia = calcular_distancia(coord[ciudad1], coord[ciudad2])
-            grafo[ciudad1][ciudad2] = distancia
-
-# Función para encontrar nodos intermedios por latitud y longitud similares
-def encontrar_nodos_intermedios(coord, origen, destino, umbral_lat, umbral_lon):
-    nodos_intermedios = []
-    lat_origen, lon_origen = coord[origen]
-    lat_destino, lon_destino = coord[destino]
-    
-    for ciudad, (lat, lon) in coord.items():
-        if ciudad != origen and ciudad != destino:
-            if (min(lat_origen, lat_destino) - umbral_lat <= lat <= max(lat_origen, lat_destino) + umbral_lat and
-                min(lon_origen, lon_destino) - umbral_lon <= lon <= max(lon_origen, lon_destino) + umbral_lon):
-                nodos_intermedios.append(ciudad)
-    
-    return nodos_intermedios
-
 @app.route('/')
 def index():
     return render_template('index.html', ciudades=coord.keys())
@@ -105,39 +45,23 @@ def index():
 @app.route('/get_routes', methods=['POST'])
 def get_routes():
     data = request.get_json()
+
     origen = data['start']
     destino = data['end']
-    umbral_lat = 0.0005  # Tolerancia para la latitud
-    umbral_lon = 0.0005  # Tolerancia para la longitud
 
     if origen not in coord or destino not in coord:
-        return jsonify({'error': 'Origen o destino no válidos.'}), 400
+        return jsonify({
+            'error': 'Origen o destino no válidos.'
+        }), 400
 
-    nodos_intermedios = encontrar_nodos_intermedios(coord, origen, destino, umbral_lat, umbral_lon)
-    nodos_intermedios.sort(key=lambda ciudad: calcular_distancia(coord[origen], coord[ciudad]))
-
-    camino_completo = [origen]
-    nodo_actual = origen
-    nodos_reales = []
-
-    for nodo_intermedio in nodos_intermedios:
-        segmento = dijkstra(grafo, nodo_actual, nodo_intermedio)
-        if segmento != "No hay camino disponible":
-            camino_completo.extend(segmento[1:])
-            nodo_actual = nodo_intermedio
-            nodos_reales.append(nodo_intermedio)
-
-    segmento_final = dijkstra(grafo, nodo_actual, destino)
-    if segmento_final != "No hay camino disponible":
-        camino_completo.extend(segmento_final[1:])
-        nodos_reales.append(destino)
-
-    coordenadas_ruta = [coord[ciudad] for ciudad in camino_completo]
+    coordenadas_ruta = [
+        coord[origen],
+        coord[destino]
+    ]
 
     return jsonify({
-        'camino': " -> ".join(camino_completo),
-        'coordenadas_ruta': coordenadas_ruta,
-        'nodos_intermedios_encontrados': nodos_reales
+        'camino': f'{origen} -> {destino}',
+        'coordenadas_ruta': coordenadas_ruta
     })
 
 if __name__ == '__main__':

@@ -1,10 +1,4 @@
-
-*
-
-!*.py
-!templates/
-!static/
-!app.py
-!coord.py
-!templado.py
-!.gitignore
+venv/
+__pycache__/
+*.pyc
+.env

@@ -20,57 +20,65 @@
             directionsRenderer.setMap(map);
         }
 
-        function trazarRuta(coordenadasRuta, nodosIntermedios, distancia) {
-            const waypoints = coordenadasRuta.slice(1, -1).map(coord => ({
-                location: { lat: coord[0], lng: coord[1] },
-                stopover: true
-            }));
+        function trazarRuta(coordenadasRuta, distancia) {
 
             const origen = coordenadasRuta[0];
-            const destino = coordenadasRuta[coordenadasRuta.length - 1];
+            const destino = coordenadasRuta[1];
 
             const request = {
                 origin: { lat: origen[0], lng: origen[1] },
                 destination: { lat: destino[0], lng: destino[1] },
-                waypoints: waypoints,
                 travelMode: google.maps.TravelMode.DRIVING
+                //avoidFerries: true
             };
 
             directionsService.route(request, (result, status) => {
+
                 if (status === google.maps.DirectionsStatus.OK) {
+
                     directionsRenderer.setDirections(result);
 
                     let totalDistance = 0;
-                    result.routes[0].legs.forEach(leg => {
+
+                        result.routes[0].legs.forEach(leg => {
                         totalDistance += leg.distance.value;
                     });
+
                     const distanceInKm = (totalDistance / 1000).toFixed(2);
 
-                    mostrarInfoRuta(nodosIntermedios, distanceInKm);
+                        mostrarInfoRuta(distanceInKm);
+
                 } else {
                     alert('Error al obtener la ruta: ' + status);
                 }
             });
         }
 
-        function mostrarInfoRuta(nodosIntermedios, distancia) {
-            // Busca el contenedor de información existente y lo elimina si está presente
+
+        function mostrarInfoRuta(distancia) {
+
             const existingInfoDiv = document.querySelector('.info');
+
             if (existingInfoDiv) {
                 existingInfoDiv.remove();
             }
 
-            // Crea un nuevo contenedor de información
             const infoDiv = document.createElement('div');
+
             infoDiv.classList.add('info');
 
-            // Prepara el contenido de la información
-            const infoText = `<p>Ciudades por las que pasa: <span>${nodosIntermedios.join(', ')}</span></p>
-                              <p>Distancia total: <span>${distancia}</span> km</p>`;
+            const infoText = `
+                <p>
+                    Distancia total:
+                    <span>${distancia}</span> km
+                </p>
+            `;
 
-            // Inserta el nuevo contenido de la información
             infoDiv.innerHTML = infoText;
-            document.getElementById('map').insertAdjacentElement('afterend', infoDiv);
+
+            document
+                .getElementById('map')
+                .insertAdjacentElement('afterend', infoDiv);
         }
 
         function obtenerRuta() {
@@ -89,7 +97,7 @@
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    trazarRuta(data.coordenadas_ruta, data.nodos_intermedios_encontrados, data.distancia);
+                    trazarRuta(data.coordenadas_ruta, data.distancia_km);
                 }
             })
             .catch(error => {
